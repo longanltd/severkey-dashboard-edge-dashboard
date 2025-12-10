@@ -1,72 +1,98 @@
-/* This is a demo sidebar. **COMPULSORY** Edit this file to customize the sidebar OR remove it from appLayout OR don't use appLayout at all */
-import React from "react";
-import { Home, Layers, Compass, Star, Settings, LifeBuoy } from "lucide-react";
+import {
+  LayoutDashboard,
+  Box,
+  KeyRound,
+  PlusCircle,
+  Settings,
+  LifeBuoy,
+  LogOut,
+  UserCircle,
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
   SidebarHeader,
-  SidebarSeparator,
-  SidebarInput,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarMenuAction,
-  SidebarMenuBadge,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
-
+import { Button } from "./ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+const navItems = [
+  { href: "#", icon: <LayoutDashboard />, label: "Dashboard", active: true },
+  { href: "#", icon: <Box />, label: "Products" },
+  { href: "#", icon: <KeyRound />, label: "License Management" },
+];
+const bottomNavItems = [
+  { href: "#", icon: <Settings />, label: "Settings" },
+  { href: "#", icon: <LifeBuoy />, label: "Support" },
+];
 export function AppSidebar(): JSX.Element {
   return (
-    <Sidebar>
+    <Sidebar className="bg-[#081028] border-r border-slate-800 text-slate-300">
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-1">
-          <div className="h-6 w-6 rounded-md bg-gradient-to-br from-indigo-500 to-purple-500" />
-          <span className="text-sm font-medium">Demo Sidebar</span>
+          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#FF7A18] to-[#0FB4D4]" />
+          <span className="text-lg font-display font-semibold text-white">SeverKey</span>
         </div>
-        <SidebarInput placeholder="Search" />
       </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
+      <SidebarContent className="flex flex-col justify-between">
+        <div className="flex-grow">
           <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive>
-                <a href="#"><Home /> <span>Home</span></a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <a href="#"><Layers /> <span>Projects</span></a>
-              </SidebarMenuButton>
-              <SidebarMenuAction>
-                <Star className="size-4" />
-              </SidebarMenuAction>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <a href="#"><Compass /> <span>Explore</span></a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+            {navItems.map((item) => (
+              <SidebarMenuItem key={item.label}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={item.active}
+                  className="data-[active=true]:bg-slate-800 data-[active=true]:text-white hover:bg-slate-800/50 hover:text-white"
+                >
+                  <a href={item.href}>
+                    {item.icon} <span>{item.label}</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
           </SidebarMenu>
-        </SidebarGroup>
-
-        <SidebarSeparator />
-
-        <SidebarGroup>
-          <SidebarGroupLabel>Quick Links</SidebarGroupLabel>
+        </div>
+        <div>
+          <div className="px-4 mb-4">
+            <Button className="w-full bg-gradient-to-r from-[#FF7A18] to-[#0FB4D4] text-white hover:opacity-90 transition-opacity">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Create License
+            </Button>
+          </div>
           <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <a href="#"><Star /> <span>Starred</span></a>
-              </SidebarMenuButton>
-              <SidebarMenuBadge>5</SidebarMenuBadge>
-            </SidebarMenuItem>
+            {bottomNavItems.map((item) => (
+              <SidebarMenuItem key={item.label}>
+                <SidebarMenuButton asChild className="hover:bg-slate-800/50 hover:text-white">
+                  <a href={item.href}>
+                    {item.icon} <span>{item.label}</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
           </SidebarMenu>
-        </SidebarGroup>
+        </div>
       </SidebarContent>
       <SidebarFooter>
-        <div className="px-2 text-xs text-muted-foreground">A simple shadcn sidebar</div>
+        <SidebarSeparator className="bg-slate-700" />
+        <div className="flex items-center justify-between p-3">
+          <div className="flex items-center gap-3">
+            <Avatar className="h-9 w-9">
+              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium text-white">Admin</span>
+              <span className="text-xs text-slate-400">admin@severkey.com</span>
+            </div>
+          </div>
+          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-slate-800">
+            <LogOut className="h-5 w-5" />
+          </Button>
+        </div>
       </SidebarFooter>
     </Sidebar>
   );
