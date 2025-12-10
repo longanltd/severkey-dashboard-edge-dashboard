@@ -2,7 +2,7 @@
 
 A production-grade, visually stunning admin frontend for managing products and licenses, hosted on Cloudflare's edge network. This single-page dashboard provides an information-dense interface with stat cards, tables, activity panels, and quick actions, emphasizing a high-end dark theme with custom gradient accents, glassmorphism effects, and smooth micro-interactions.
 
-[cloudflarebutton]
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/longanltd/severkey-dashboard-edge-dashboard)
 
 ## Features
 
@@ -191,7 +191,7 @@ Deploy to Cloudflare Workers for edge hosting:
 
 For one-click deployment from this repository:
 
-[cloudflarebutton]
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/longanltd/severkey-dashboard-edge-dashboard)
 
 ### Custom Domain
 Bind a custom domain via the Cloudflare dashboard:
