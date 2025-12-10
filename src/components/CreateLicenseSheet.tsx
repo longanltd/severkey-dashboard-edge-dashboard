@@ -20,18 +20,12 @@ import { PlusCircle, CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import type { Product, License } from "@shared/types";
-import { Progress } from "@/components/ui/progress";
-import { motion } from "framer-motion";
-const fieldVariants = {
-  hidden: { opacity: 0, x: -10 },
-  visible: { opacity: 1, x: 0 },
-};
 export function CreateLicenseSheet() {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [expiresAt, setExpiresAt] = useState<Date | undefined>();
-  const { data: productsData } = useQuery({
+  const { data: productsData, isLoading: isLoadingProducts } = useQuery({
     queryKey: ["products"],
     queryFn: () => api<{ items: Product[] }>("/api/products"),
   });
@@ -45,7 +39,6 @@ export function CreateLicenseSheet() {
     onSuccess: () => {
       toast.success("License created successfully!");
       queryClient.invalidateQueries({ queryKey: ["licenses"] });
-      queryClient.invalidateQueries({ queryKey: ["licensesInfinite"] });
       setSelectedProduct(null);
       setExpiresAt(undefined);
       setOpen(false);
@@ -64,7 +57,6 @@ export function CreateLicenseSheet() {
       expiresAt: expiresAt ? expiresAt.getTime() : null,
     });
   };
-  const progressValue = selectedProduct ? 50 : 0;
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
@@ -80,9 +72,8 @@ export function CreateLicenseSheet() {
             Generate a new license key for a product.
           </SheetDescription>
         </SheetHeader>
-        <Progress value={progressValue} className="w-full my-4 h-1 bg-slate-700" />
-        <div className="space-y-8 py-4">
-          <motion.div variants={fieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.1 }} className="space-y-2">
+        <div className="space-y-8 py-8">
+          <div className="space-y-2">
             <label className="text-sm font-medium text-white">Product</label>
             <Popover>
               <PopoverTrigger asChild>
@@ -118,8 +109,8 @@ export function CreateLicenseSheet() {
                 </Command>
               </PopoverContent>
             </Popover>
-          </motion.div>
-          <motion.div variants={fieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.2 }} className="space-y-2">
+          </div>
+          <div className="space-y-2">
             <label className="text-sm font-medium text-white">Expiration Date (Optional)</label>
             <Popover>
               <PopoverTrigger asChild>
@@ -143,7 +134,7 @@ export function CreateLicenseSheet() {
                 />
               </PopoverContent>
             </Popover>
-          </motion.div>
+          </div>
         </div>
         <SheetFooter>
           <SheetClose asChild>

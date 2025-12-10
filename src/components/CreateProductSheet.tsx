@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
@@ -25,10 +26,9 @@ const productSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
   price: z.coerce.number().positive("Price must be a positive number"),
 });
-type ProductFormValues = z.infer<typeof productSchema>;
 export function CreateProductSheet() {
   const queryClient = useQueryClient();
-  const form = useForm<ProductFormValues>({
+  const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
     defaultValues: { name: "", description: "", price: 0 },
   });
@@ -50,7 +50,7 @@ export function CreateProductSheet() {
       toast.error(`Failed to create product: ${error.message}`);
     },
   });
-  function onSubmit(values: ProductFormValues) {
+  function onSubmit(values: z.infer<typeof productSchema>) {
     mutation.mutate({ ...values, price: values.price * 100 });
   }
   return (

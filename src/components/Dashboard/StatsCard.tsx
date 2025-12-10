@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 interface StatsCardProps {
   label: string;
   value: string | number;
@@ -10,7 +10,7 @@ interface StatsCardProps {
   deltaColor?: "text-green-500" | "text-red-500";
   isLoading?: boolean;
 }
-const cardVariants = {
+const cardVariants: Variants = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
   hover: { y: -4, transition: { type: "spring", stiffness: 300 } },
