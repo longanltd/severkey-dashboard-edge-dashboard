@@ -14,6 +14,7 @@ import '@/index.css'
 import { HomePage } from '@/pages/HomePage'
 import ProductsPage from '@/pages/ProductsPage';
 import LicenseManagementPage from '@/pages/LicenseManagementPage';
+import SettingsPage from '@/pages/SettingsPage';
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
   {
@@ -29,6 +30,11 @@ const router = createBrowserRouter([
   {
     path: "/licenses",
     element: <LicenseManagementPage />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/settings",
+    element: <SettingsPage />,
     errorElement: <RouteErrorBoundary />,
   },
 ]);

@@ -21,6 +21,7 @@ import type { User } from "@shared/types";
 import { MOCK_LICENSE_TRENDS, MOCK_ACTIVITY_DATA } from "@shared/mock-data";
 import { ActivityTimeline } from "@/components/Dashboard/ActivityTimeline";
 import { ExportCSVButton } from "@/components/ExportCSVButton";
+import { motion } from "framer-motion";
 const stats = [
   { label: "Products", value: "12", icon: <Box className="h-5 w-5" />, delta: "+2 this month" },
   { label: "Licenses", value: "1,204", icon: <KeyRound className="h-5 w-5" />, delta: "+150 this month" },
@@ -29,6 +30,15 @@ const stats = [
   { label: "Banned", value: "4", icon: <AlertTriangle className="h-5 w-5" /> },
   { label: "Devices", value: "2,350", icon: <Users className="h-5 w-5" /> },
 ];
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
 function RecentActivityCard() {
     return (
         <Card className="bg-muted/40 backdrop-blur-sm border-muted-foreground/30 shadow-soft rounded-2xl h-full">
@@ -80,7 +90,12 @@ export function HomePage() {
                 <ThemeToggle className="relative top-0 right-0" />
               </div>
             </header>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-8">
+            <motion.div
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-8"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
               {stats.map((stat, index) => (
                 <StatsCard
                   key={index}
@@ -93,7 +108,7 @@ export function HomePage() {
                   chartData={MOCK_LICENSE_TRENDS}
                 />
               ))}
-            </div>
+            </motion.div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
               <div className="lg:col-span-2">
                 <LicenseTable />
@@ -107,14 +122,14 @@ export function HomePage() {
                 <CardTitle>Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <Button variant="outline" className="bg-transparent text-white border-slate-700 hover:bg-slate-800 hover:text-white justify-start p-4 h-auto">
+                  <Button variant="outline" className="bg-transparent text-white border-slate-700 hover:bg-slate-800 hover:text-white justify-start p-4 h-auto" aria-label="Generate a new license key">
                       <KeyRound className="mr-3 h-5 w-5 text-[#0FB4D4]" />
                       <div className="text-left">
                           <p className="font-semibold">Generate Key</p>
                           <p className="text-xs text-muted-foreground">Create a new license</p>
                       </div>
                   </Button>
-                  <Button variant="outline" className="bg-transparent text-white border-slate-700 hover:bg-slate-800 hover:text-white justify-start p-4 h-auto">
+                  <Button variant="outline" className="bg-transparent text-white border-slate-700 hover:bg-slate-800 hover:text-white justify-start p-4 h-auto" aria-label="Add a new product">
                       <Box className="mr-3 h-5 w-5 text-[#FF7A18]" />
                       <div className="text-left">
                           <p className="font-semibold">New Product</p>
@@ -122,7 +137,7 @@ export function HomePage() {
                       </div>
                   </Button>
                   <ExportCSVButton data={licensesData?.items ?? []} filename="licenses_export.csv" className="bg-transparent text-white border-slate-700 hover:bg-slate-800 hover:text-white justify-start p-4 h-auto text-left" />
-                  <Button variant="outline" className="bg-transparent text-white border-slate-700 hover:bg-slate-800 hover:text-white justify-start p-4 h-auto">
+                  <Button variant="outline" className="bg-transparent text-white border-slate-700 hover:bg-slate-800 hover:text-white justify-start p-4 h-auto" aria-label="View activity logs">
                       <Activity className="mr-3 h-5 w-5 text-slate-400" />
                       <div className="text-left">
                           <p className="font-semibold">View Logs</p>

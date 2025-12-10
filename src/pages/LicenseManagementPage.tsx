@@ -36,11 +36,11 @@ function LicenseManagementPage() {
     getNextPageParam: (lastPage) => lastPage.next,
   });
   useEffect(() => {
-    if (inView && hasNextPage) {
+    if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  }, [inView, hasNextPage, fetchNextPage]);
-  const { data: productsData, isLoading: isLoadingProducts } = useQuery({
+  }, [inView, hasNextPage, fetchNextPage, isFetchingNextPage]);
+  const { data: productsData } = useQuery({
     queryKey: ["products"],
     queryFn: () => api<{ items: Product[] }>("/api/products"),
   });
@@ -92,19 +92,21 @@ function LicenseManagementPage() {
                 <div className="relative flex-grow"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input placeholder="Search licenses..." className="pl-9 bg-slate-900 border-slate-700 text-white" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild><Button variant="outline" className="bg-slate-900 border-slate-700 text-white"><Filter className="mr-2 h-4 w-4" />Status{statusFilters.size > 0 && ` (${statusFilters.size})`}</Button></DropdownMenuTrigger>
-                    <DropdownMenuContent><Object.keys(STATUS_MAP).map(s => <DropdownMenuCheckboxItem key={s} checked={statusFilters.has(s as LicenseStatus)} onCheckedChange={() => toggleStatusFilter(s as LicenseStatus)}>{STATUS_MAP[s as LicenseStatus].text}</DropdownMenuCheckboxItem>)}</DropdownMenuContent>
+                    <DropdownMenuContent>
+                      {Object.keys(STATUS_MAP).map(s => <DropdownMenuCheckboxItem key={s} checked={statusFilters.has(s as LicenseStatus)} onCheckedChange={() => toggleStatusFilter(s as LicenseStatus)}>{STATUS_MAP[s as LicenseStatus].text}</DropdownMenuCheckboxItem>)}
+                    </DropdownMenuContent>
                 </DropdownMenu>
                 <ExportCSVButton data={filteredLicenses} filename="licenses.csv" className="bg-slate-900 border-slate-700 text-white" />
             </div>
             {selected.size > 0 && <BulkActions selectedIds={Array.from(selected)} onComplete={() => setSelected(new Set())} />}
             <div className="rounded-2xl border border-muted-foreground/30 bg-muted/40 backdrop-blur-sm shadow-soft overflow-hidden">
               <Table>
-                <TableHeader><TableRow><TableHead className="w-12"><Checkbox onCheckedChange={handleSelectAll} checked={selected.size > 0 && selected.size === filteredLicenses.length} /></TableHead><TableHead>License Key</TableHead><TableHead>Product</TableHead><TableHead>Status</TableHead><TableHead>Expires</TableHead><TableHead>Created</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader>
+                <TableHeader><TableRow><TableHead className="w-12"><Checkbox onCheckedChange={handleSelectAll} checked={selected.size > 0 && selected.size === filteredLicenses.length && filteredLicenses.length > 0} /></TableHead><TableHead>License Key</TableHead><TableHead>Product</TableHead><TableHead>Status</TableHead><TableHead>Expires</TableHead><TableHead>Created</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader>
                 <TableBody>
                   {isLoadingLicenses && allLicenses.length === 0 ? renderSkeleton() : filteredLicenses.map(license => {
                     const status = STATUS_MAP[license.status];
                     return (
-                      <motion.tr key={license.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} whileHover={{ scale: 1.01, backgroundColor: 'hsl(var(--muted))' }} className="[&>td]:border-b [&>td]:border-slate-800">
+                      <motion.tr key={license.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} whileHover={{ backgroundColor: 'hsl(var(--muted))' }} className="[&>td]:border-b [&>td]:border-slate-800">
                         <TableCell><Checkbox checked={selected.has(license.id)} onCheckedChange={(checked) => handleSelectRow(license.id, !!checked)} /></TableCell>
                         <TableCell className="font-mono text-xs">{license.key}</TableCell>
                         <TableCell>{productsMap.get(license.productId) ?? 'Unknown'}</TableCell>

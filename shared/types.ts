@@ -37,3 +37,8 @@ export interface License {
   metadata: Record<string, any>;
   createdAt: number;
 }
+export interface ApiKey {
+  id: string;
+  key: string;
+  createdAt: number;
+}

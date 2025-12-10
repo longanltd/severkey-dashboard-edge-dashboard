@@ -26,7 +26,7 @@ const navItems = [
   { to: "/licenses", icon: <KeyRound />, label: "Licenses" },
 ];
 const bottomNavItems = [
-  { to: "#", icon: <Settings />, label: "Settings" },
+  { to: "/settings", icon: <Settings />, label: "Settings" },
   { to: "#", icon: <LifeBuoy />, label: "Support" },
 ];
 export function AppSidebar(): JSX.Element {
@@ -64,7 +64,7 @@ export function AppSidebar(): JSX.Element {
           <SidebarMenu>
             {bottomNavItems.map((item) => (
               <SidebarMenuItem key={item.label}>
-                <SidebarMenuButton asChild className="hover:bg-slate-800/50 hover:text-white">
+                <SidebarMenuButton asChild isActive={location.pathname === item.to} className="data-[active=true]:bg-slate-800 data-[active=true]:text-white hover:bg-slate-800/50 hover:text-white">
                   <Link to={item.to}>
                     {item.icon} <span>{item.label}</span>
                   </Link>

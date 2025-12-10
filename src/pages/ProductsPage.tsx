@@ -8,7 +8,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
 import type { Product } from "@shared/types";
-import { Box, PlusCircle, Search, PackagePlus, Calendar as CalendarIcon } from "lucide-react";
+import { Box, Search, PackagePlus, Calendar as CalendarIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { CreateProductSheet } from "@/components/CreateProductSheet";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -27,9 +27,9 @@ function ProductCard({ product }: { product: Product }) {
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -20, scale: 0.95 }}
       transition={{ type: "spring", stiffness: 300, damping: 25 }}
     >
       <Card className="bg-muted/40 backdrop-blur-sm border-muted-foreground/30 shadow-soft rounded-2xl h-full flex flex-col">
@@ -94,7 +94,7 @@ function ProductsPage() {
   );
   const renderEmptyState = () => (
     <div className="col-span-full flex flex-col items-center justify-center text-center py-24 rounded-2xl bg-muted/20 border-2 border-dashed border-muted-foreground/30">
-        <PackagePlus className="h-16 w-16 text-muted-foreground/50 mb-4" />
+        <img src="https://images.unsplash.com/photo-1579226905180-636b76d96082?q=80&w=600&auto=format&fit=crop" alt="Empty products" className="w-32 h-32 rounded-full object-cover mb-4 opacity-50" />
         <h2 className="text-2xl font-bold text-white">No Products Found</h2>
         <p className="text-muted-foreground mt-2 mb-6">Try adjusting your filters or create a new product.</p>
         <CreateProductSheet />
@@ -115,11 +115,11 @@ function ProductsPage() {
             <div className="mb-8 p-4 rounded-2xl border border-muted-foreground/30 bg-muted/20 flex flex-col md:flex-row gap-4 items-center">
                 <div className="relative flex-grow w-full md:w-auto">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="Search products..." className="pl-9 bg-muted/40 border-muted-foreground/30 text-white" value={search} onChange={(e) => setSearch(e.target.value)} />
+                    <Input placeholder="Search products..." className="pl-9 bg-muted/40 border-muted-foreground/30 text-white" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Search products" />
                 </div>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full md:w-auto justify-start text-left font-normal bg-muted/40 border-muted-foreground/30 text-white hover:bg-muted/60">
+                    <Button variant="outline" className="w-full md:w-auto justify-start text-left font-normal bg-muted/40 border-muted-foreground/30 text-white hover:bg-muted/60" aria-describedby="date-range-description">
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {dateRange?.from ? (dateRange.to ? `${format(dateRange.from, "LLL dd, y")} - ${format(dateRange.to, "LLL dd, y")}` : format(dateRange.from, "LLL dd, y")) : <span>Pick a date range</span>}
                     </Button>
@@ -127,8 +127,8 @@ function ProductsPage() {
                   <PopoverContent className="w-auto p-0" align="start"><Calendar mode="range" selected={dateRange} onSelect={setDateRange} numberOfMonths={2} /></PopoverContent>
                 </Popover>
                 <div className="w-full md:w-64 space-y-2">
-                    <div className="flex justify-between text-xs text-muted-foreground"><span>Price: {formatCurrency(priceRange[0]*100)}</span><span>{formatCurrency(priceRange[1]*100)}</span></div>
-                    <Slider value={priceRange} onValueChange={setPriceRange} max={500} step={10} className="[&>span:first-child]:h-1" />
+                    <div className="flex justify-between text-xs text-muted-foreground" id="price-range-label"><span>Price: {formatCurrency(priceRange[0]*100)}</span><span>{formatCurrency(priceRange[1]*100)}</span></div>
+                    <Slider value={priceRange} onValueChange={setPriceRange} max={500} step={10} className="[&>span:first-child]:h-1" aria-labelledby="price-range-label" />
                 </div>
                 <ExportCSVButton data={filteredProducts} filename="products.csv" className="bg-transparent text-white border-slate-700 hover:bg-slate-800 hover:text-white" />
             </div>

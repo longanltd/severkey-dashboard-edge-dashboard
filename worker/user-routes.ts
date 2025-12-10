@@ -2,7 +2,11 @@ import { Hono } from "hono";
 import type { Env } from './core-utils';
 import { UserEntity, ChatBoardEntity, ProductEntity, LicenseEntity } from "./entities";
 import { ok, bad, notFound, isStr } from './core-utils';
-import type { Product, License } from "@shared/types";
+import type { Product, License, ApiKey } from "@shared/types";
+// In a real app, API keys would be a separate entity. For this demo, we'll store them in-memory on the worker.
+const MOCK_API_KEYS: ApiKey[] = [
+  { id: crypto.randomUUID(), key: `sk_live_${crypto.randomUUID().replace(/-/g, '')}`, createdAt: Date.now() - 86400000 * 5 },
+];
 export function userRoutes(app: Hono<{ Bindings: Env }>) {
   app.get('/api/test', (c) => c.json({ success: true, data: { name: 'CF Workers Demo' }}));
   // USERS
@@ -82,6 +86,19 @@ export function userRoutes(app: Hono<{ Bindings: Env }>) {
     const license = new LicenseEntity(c.env, c.req.param('id'));
     if (!await license.exists()) return notFound(c, 'license not found');
     return ok(c, await license.revoke());
+  });
+  // API KEYS (Mock)
+  app.get('/api/api-keys', (c) => {
+    return ok(c, MOCK_API_KEYS);
+  });
+  app.post('/api/api-keys', (c) => {
+    const newKey: ApiKey = {
+      id: crypto.randomUUID(),
+      key: `sk_live_${crypto.randomUUID().replace(/-/g, '')}`,
+      createdAt: Date.now(),
+    };
+    MOCK_API_KEYS.push(newKey);
+    return ok(c, newKey);
   });
   // DELETE: Users
   app.delete('/api/users/:id', async (c) => ok(c, { id: c.req.param('id'), deleted: await UserEntity.delete(c.env, c.req.param('id')) }));
