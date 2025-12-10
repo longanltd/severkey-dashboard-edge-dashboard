@@ -14,11 +14,13 @@ import {
 } from "lucide-react";
 import { StatsCard } from "@/components/Dashboard/StatsCard";
 import { LicenseTable } from "@/components/Dashboard/LicenseTable";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
 import type { User } from "@shared/types";
+import { MOCK_LICENSE_TRENDS, MOCK_ACTIVITY_DATA } from "@shared/mock-data";
+import { ActivityTimeline } from "@/components/Dashboard/ActivityTimeline";
+import { ExportCSVButton } from "@/components/ExportCSVButton";
 const stats = [
   { label: "Products", value: "12", icon: <Box className="h-5 w-5" />, delta: "+2 this month" },
   { label: "Licenses", value: "1,204", icon: <KeyRound className="h-5 w-5" />, delta: "+150 this month" },
@@ -27,56 +29,40 @@ const stats = [
   { label: "Banned", value: "4", icon: <AlertTriangle className="h-5 w-5" /> },
   { label: "Devices", value: "2,350", icon: <Users className="h-5 w-5" /> },
 ];
-const recentActivity = [
-    { user: "Alex", action: "created a new license for 'Pro Plan'", time: "2m ago" },
-    { user: "Jordan", action: "banned license key ending in ...4f3a", time: "1h ago" },
-    { user: "Taylor", action: "updated the 'Enterprise' product", time: "3h ago" },
-    { user: "Casey", action: "revoked 3 licenses", time: "1d ago" },
-];
 function RecentActivityCard() {
     return (
         <Card className="bg-muted/40 backdrop-blur-sm border-muted-foreground/30 shadow-soft rounded-2xl h-full">
             <CardHeader>
                 <CardTitle>Recent Activity</CardTitle>
+                <CardDescription>License creations and revocations over the last 7 days.</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="space-y-6">
-                    {recentActivity.map((activity, index) => (
-                        <div key={index} className="flex items-start gap-4">
-                            <Avatar className="h-9 w-9">
-                                <AvatarImage src={`https://i.pravatar.cc/40?u=${activity.user}`} />
-                                <AvatarFallback>{activity.user.substring(0, 2).toUpperCase()}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                                <p className="text-sm">
-                                    <span className="font-semibold text-foreground">{activity.user}</span>
-                                    <span className="text-muted-foreground"> {activity.action}</span>
-                                </p>
-                                <p className="text-xs text-muted-foreground">{activity.time}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                <ActivityTimeline data={MOCK_ACTIVITY_DATA} />
             </CardContent>
         </Card>
     );
 }
 export function HomePage() {
-  const { data, isLoading } = useQuery({
+  const { data: userData, isLoading: isLoadingUser } = useQuery({
     queryKey: ["users"],
     queryFn: () => api<{ items: User[] }>("/api/users"),
+    staleTime: 5 * 60 * 1000,
   });
-  const user = data?.items?.[0];
+  const { data: licensesData } = useQuery({
+    queryKey: ["licenses"],
+    queryFn: () => api<{ items: any[] }>("/api/licenses"),
+    staleTime: 5 * 60 * 1000,
+  });
+  const user = userData?.items?.[0];
   return (
     <AppLayout container={false} className="bg-[#081028]">
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-8 md:py-10 lg:py-12">
-            {/* Header */}
             <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
               <div>
                 <h1 className="text-3xl font-bold text-white">
-                  Welcome back, {isLoading ? <div className="inline-block h-8 w-32 bg-slate-700 rounded animate-pulse" /> : user?.name || "Admin"}!
+                  Welcome back, {isLoadingUser ? <div className="inline-block h-8 w-32 bg-slate-700 rounded animate-pulse" /> : user?.name || "Admin"}!
                 </h1>
                 <p className="text-muted-foreground mt-1">
                   Here's a snapshot of your products and licenses.
@@ -94,7 +80,6 @@ export function HomePage() {
                 <ThemeToggle className="relative top-0 right-0" />
               </div>
             </header>
-            {/* Stat Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-8">
               {stats.map((stat, index) => (
                 <StatsCard
@@ -104,11 +89,11 @@ export function HomePage() {
                   icon={stat.icon}
                   delta={stat.delta}
                   deltaColor={stat.deltaColor as any}
-                  isLoading={isLoading}
+                  isLoading={isLoadingUser}
+                  chartData={MOCK_LICENSE_TRENDS}
                 />
               ))}
             </div>
-            {/* Main Content Area */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
               <div className="lg:col-span-2">
                 <LicenseTable />
@@ -117,7 +102,6 @@ export function HomePage() {
                 <RecentActivityCard />
               </div>
             </div>
-            {/* Quick Actions */}
             <Card className="bg-muted/40 backdrop-blur-sm border-muted-foreground/30 shadow-soft rounded-2xl">
               <CardHeader>
                 <CardTitle>Quick Actions</CardTitle>
@@ -137,13 +121,7 @@ export function HomePage() {
                           <p className="text-xs text-muted-foreground">Add a new product</p>
                       </div>
                   </Button>
-                  <Button variant="outline" className="bg-transparent text-white border-slate-700 hover:bg-slate-800 hover:text-white justify-start p-4 h-auto">
-                      <Users className="mr-3 h-5 w-5 text-slate-400" />
-                      <div className="text-left">
-                          <p className="font-semibold">Manage Users</p>
-                          <p className="text-xs text-muted-foreground">Add or remove users</p>
-                      </div>
-                  </Button>
+                  <ExportCSVButton data={licensesData?.items ?? []} filename="licenses_export.csv" className="bg-transparent text-white border-slate-700 hover:bg-slate-800 hover:text-white justify-start p-4 h-auto text-left" />
                   <Button variant="outline" className="bg-transparent text-white border-slate-700 hover:bg-slate-800 hover:text-white justify-start p-4 h-auto">
                       <Activity className="mr-3 h-5 w-5 text-slate-400" />
                       <div className="text-left">
