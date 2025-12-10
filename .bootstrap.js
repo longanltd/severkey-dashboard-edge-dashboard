@@ -78,7 +78,8 @@ function updateWranglerJsonc() {
 
 function runSetupCommands() {
     const commands = [
-    "bun install react-intersection-observer"
+    "bun install react-intersection-observer",
+    "bun add react-intersection-observer"
 ];
     
     if (commands.length === 0) {
