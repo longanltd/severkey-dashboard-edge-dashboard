@@ -17,7 +17,6 @@ import { BulkActions } from "@/components/BulkActions";
 import { CreateLicenseSheet } from "@/components/CreateLicenseSheet";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuCheckboxItem } from "@/components/ui/dropdown-menu";
 import { motion } from "framer-motion";
-import { useInView } from "react-intersection-observer";
 import { ExportCSVButton } from "@/components/ExportCSVButton";
 const STATUS_MAP: { [key in License['status']]: { text: string; className: string } } = {
   active: { text: "Active", className: "bg-green-500/20 text-green-400 border-green-500/30" },
@@ -28,18 +27,12 @@ function LicenseManagementPage() {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [statusFilters, setStatusFilters] = useState<Set<LicenseStatus>>(new Set());
-  const { ref, inView } = useInView();
   const { data: licensesData, isLoading: isLoadingLicenses, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ["licensesInfinite"],
-    queryFn: ({ pageParam }) => api<{ items: License[]; next: string | null }>(`/api/licenses?cursor=${pageParam || ''}&limit=20`),
+    queryFn: ({ pageParam }) => api<{ items: License[]; next: string | null }>(`/api/licenses?cursor=${pageParam || ''}&limit=50`),
     initialPageParam: '',
     getNextPageParam: (lastPage) => lastPage.next,
   });
-  useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
-    }
-  }, [inView, hasNextPage, fetchNextPage, isFetchingNextPage]);
   const { data: productsData } = useQuery({
     queryKey: ["products"],
     queryFn: () => api<{ items: Product[] }>("/api/products"),
@@ -119,7 +112,17 @@ function LicenseManagementPage() {
                   })}
                 </TableBody>
               </Table>
-              <div ref={ref} className="h-10 flex justify-center items-center">{isFetchingNextPage && <p className="text-sm text-muted-foreground">Loading more...</p>}</div>
+              <div className="h-10 flex justify-center items-center">
+                {hasNextPage && (
+                  <Button
+                    variant="link"
+                    onClick={() => fetchNextPage()}
+                    disabled={isFetchingNextPage}
+                  >
+                    {isFetchingNextPage ? 'Loading more...' : 'Load More'}
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>

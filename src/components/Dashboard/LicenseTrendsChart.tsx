@@ -7,7 +7,6 @@ interface LicenseTrendsChartProps {
 }
 export function LicenseTrendsChart({ data, variant = 'full', className }: LicenseTrendsChartProps) {
   const ChartComponent = variant === 'mini' ? AreaChart : LineChart;
-  const LineComponent = variant === 'mini' ? Area : Line;
   return (
     <motion.div
       className={className}
@@ -32,15 +31,26 @@ export function LicenseTrendsChart({ data, variant = 'full', className }: Licens
               <stop offset="95%" stopColor="#0FB4D4" stopOpacity={0}/>
             </linearGradient>
           </defs>
-          <LineComponent
-            type="monotone"
-            dataKey="active"
-            stroke="#0FB4D4"
-            strokeWidth={2}
-            dot={variant === 'full'}
-            fill={variant === 'mini' ? "url(#colorActive)" : "none"}
-          />
-          {variant === 'full' && <Line type="monotone" dataKey="expired" stroke="#FF7A18" strokeWidth={2} dot />}
+          {variant === 'mini' ? (
+            <Area
+              type="monotone"
+              dataKey="active"
+              stroke="#0FB4D4"
+              strokeWidth={2}
+              fill="url(#colorActive)"
+            />
+          ) : (
+            <>
+              <Line
+                type="monotone"
+                dataKey="active"
+                stroke="#0FB4D4"
+                strokeWidth={2}
+                dot
+              />
+              <Line type="monotone" dataKey="expired" stroke="#FF7A18" strokeWidth={2} dot />
+            </>
+          )}
         </ChartComponent>
       </ResponsiveContainer>
     </motion.div>

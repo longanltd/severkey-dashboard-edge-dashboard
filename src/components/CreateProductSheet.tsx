@@ -23,14 +23,14 @@ import type { Product } from "@shared/types";
 const productSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
-  price: z.coerce.number({ invalid_type_error: "Price must be a number" }).positive("Price must be a positive number"),
+  price: z.coerce.number().positive("Price must be a positive number"),
 });
 type ProductFormValues = z.infer<typeof productSchema>;
 export function CreateProductSheet() {
   const queryClient = useQueryClient();
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
-    defaultValues: { name: "", description: "", price: undefined },
+    defaultValues: { name: "", description: "", price: 0 },
   });
   const mutation = useMutation({
     mutationFn: (newProduct: Omit<Product, 'id' | 'createdAt'>) => {
